@@ -9,17 +9,18 @@ var app    = module.exports = koa();
 env(__dirname + '/.env');
 
 var client = new GitHubApi({
-    // required
-    version: "3.0.0",
-    // optional
-    debug: true,
-    protocol: "https",
-    host: "github.com",
-    pathPrefix: "/api/v3", // for some GHEs
-    timeout: 10000
+  version: "3.0.0",
+  debug: true,
+  protocol: "https",
+  host: "github.com",
+  pathPrefix: "/api/v3", // for some GHEs
+  timeout: 10000
 });
 
-client.authenticate(type: 'oauth', token: process.env.GITHUB_OAUTH_TOKEN);
+client.authenticate({
+  type: 'oauth',
+  token: process.env.GITHUB_OAUTH_TOKEN
+});
 
 var buildPostComment = function(body) {
   var message = " \
