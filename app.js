@@ -52,9 +52,9 @@ var post = function *(next) {
 
 app.use(function *() {
   client.issues.createComment({
-    user: user // no user
-    repo: repo // no repo
-    number: pr.number // no pr.number
+    user: user, // no user
+    repo: repo, // no repo
+    number: pr.number, // no pr.number
     body: buildPostComment(body)
   });
 });
