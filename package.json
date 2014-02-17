@@ -1,7 +1,7 @@
 {
   "name": "coveralls-webhook",
   "private": true,
-  "description": "A webhook middleware for the coveralls",
+  "description": "A webhook middleware for coveralls",
   "version": "0.0.1",
   "main": "index.js",
   "scripts": {
