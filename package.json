@@ -9,7 +9,7 @@
     "test": "source .env && ./node_modules/.bin/mocha --harmony"
   },
   "engines": {
-    "node": "0.11.11"
+    "node": "0.11.x"
   },
   "dependencies": {
     "koa": "~0.4.0",
