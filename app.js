@@ -9,7 +9,8 @@ var commentBuilder = require('./lib/comment-builder');
 var app = module.exports = koa();
 app.use(logger());
 
-var env = process.env.NODE_ENV || 'development';
+var env  = process.env.NODE_ENV || 'development';
+var port = process.env.PORT || 3000;
 
 var post = function *(next) {
   var params = yield parse(this, { limit: '1kb' });
@@ -37,4 +38,9 @@ app.use(route.get('/ping', function *() {
 }));
 
 app.use(route.post('/' + process.env.WEBHOOK_PATH, post));
-if (!module.parent) app.listen(3000);
+
+if (!module.parent) {
+  app.listen(port, function () {
+    console.log('app running on %d', port);
+  });
+}
