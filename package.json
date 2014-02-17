@@ -6,7 +6,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node --harmony app.js",
-    "test": "source .env && ./node_modules/.bin/mocha --harmony"
+    "test": "./node_modules/.bin/mocha --harmony"
   },
   "engines": {
     "node": "0.11.x"
