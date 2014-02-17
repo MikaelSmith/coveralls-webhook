@@ -1,63 +1,40 @@
-var env    = require('node-env-file');
-var route  = require('koa-route');
-var koa    = require('koa');
-var qs     = require('querystring');
-var parse  = require('co-body');
-var github = require('github');
-var app    = module.exports = koa();
+var env            = require('node-env-file');
+var koa            = require('koa');
+var route          = require('koa-route');
+var parse          = require('co-body');
+var logger         = require('koa-logger');
+var github         = require('./lib/github');
+var commentBuilder = require('./lib/comment-builder');
 
-env(__dirname + '/.env');
+var app = module.exports = koa();
+app.use(logger());
 
-var client = new GitHubApi({
-  version: "3.0.0",
-  debug: true,
-  protocol: "https",
-  host: "github.com",
-  pathPrefix: "/api/v3", // for some GHEs
-  timeout: 10000
-});
-
-client.authenticate({
-  type: 'oauth',
-  token: process.env.GITHUB_OAUTH_TOKEN
-});
-
-var buildPostComment = function(body) {
-  var message = " \
-    <a href=\"" + body.url + "\"> \
-    <img src=\"" + body.badge_url + "\" alt=\"Coverage Status\" data-canonical-src=\"" + body.url + "/badge\" style=\"max-width:100%;\"></a> \
-    <br \><br \> \
-  ";
-
-  var coverageChange = parseInt(body.coverage_change, 10);
-
-  if (coverageChange === 0) {
-    message += "Coverage remained the same ";
-  } else if (coverageChange > 0) {
-    message += "Coverage has improved (" + coverageChange + "%) ";
-  } else {
-    message += "Coverage has declined (" + coverageChange + "%) ";
-  }
-
-  // // actually there is no base branch info, supposed as master :S
-  message += "when pulling <strong>" + body.commit_sha + " on " + body.branch + "</strong> into on <strong>master</strong>.</p> \ ";
-  return message;
-}
+var env = process.env.NODE_ENV || 'development';
 
 var post = function *(next) {
-  var body = yield parse(this, { limit: '1kb' });
-  yield next;
+  var params = yield parse(this, { limit: '1kb' });
+  var branchName = params.branch.split('/')[1]; // 'origin/foo' -> 'foo'
+  var comment = commentBuilder.build(params);
+  var slug = params.repo_name.split('/')
+  var user = slug[0];
+  var repo = slug[1];
+
+  var prs = yield github.getPullRequests(user, repo);
+
+  var matchedPrs = prs.filter(function(pr) {
+    return pr.head.ref.indexOf(branchName) > -1;
+  });
+
+  var number = (matchedPrs.length === 1) ? matchedPrs[0].number : null;
+
+  yield github.createIssuesComment(user, repo, number, comment);
+
   this.body = 'done';
 }
 
-app.use(function *() {
-  client.issues.createComment({
-    user: user, // no user
-    repo: repo, // no repo
-    number: pr.number, // no pr.number
-    body: buildPostComment(body)
-  });
-});
+app.use(route.get('/ping', function *() {
+  this.body = { pong: true };
+}));
 
 app.use(route.post('/' + process.env.WEBHOOK_PATH, post));
 if (!module.parent) app.listen(3000);
