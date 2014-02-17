@@ -13,12 +13,11 @@ Koa use generator so, this app must be running Node.js 0.11.9 or higher.
 
 ### Edit env
 
-Copy `.env.sample` to `.env`.
+Copy `.env.sample` to `.env`, then edit.
 
 ### Run app
 
 ```
-$ vi
 $ ./bin/start
 ```
 
