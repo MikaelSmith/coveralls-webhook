@@ -4,6 +4,10 @@
 
 [![Build Status](https://secure.travis-ci.org/banyan/coveralls-webhook.png?branch=master)](http://travis-ci.org/banyan/coveralls-webhook)
 
+## Sample configuration
+
+![image](http://i.imgur.com/rk2i3J2.png)
+
 ## Development
 
 ### Install Node.js 0.11.9 or higher.
